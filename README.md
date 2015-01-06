@@ -1,6 +1,6 @@
 # Soberatio
 
-![Image was drunk. Was fixed.](https://jonathantneal.github.io/soberatio/assets/sample.png#9:5)
+![Image was drunk. Was fixed.](https://jonathantneal.github.io/soberatio/assets/sample.png#drunk)
 
 **Soberatio** helps you find [the most reasonable aspect ratio](https://jonathantneal.github.io/soberatio/) of any given shape. For instance, a 647x357 image technically has an aspect ratio of, well, 647:357, but it’s often more useful to know that its nearest “sober” aspect ratio is actually 9:5.
 
