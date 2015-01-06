@@ -1,0 +1,192 @@
+<!doctype html>
+<title>Soberatio: calculate the sober ratio</title>
+<meta charset="utf-8">
+
+<style>
+@font-face {
+	font-family: "Bebas Neue";
+	font-weight: 700;
+	src: url(assets/Bebas_Neue-Bold.eot?) format("eot"),
+	     url(assets/Bebas_Neue-Bold.woff2) format("woff2"),
+	     url(assets/Bebas_Neue-Bold.woff) format("woff");
+}
+
+* {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+body {
+	background: #333;
+	color: #F9F9F3;
+	font: 700 20vmin/1 "Bebas Neue", sans-serif;
+	margin: 0;
+	overflow: hidden;
+}
+
+h1 {
+	font-size: 50%;
+	margin-left: 5%;
+	text-shadow: 0 0.025em 0.025em rgba(0,0,0,0.5);
+}
+
+h1 span {
+	color: rgba(255,235,85,1);
+}
+
+h1 small {
+	display: block;
+	font-size: 35%;
+	letter-spacing: 0.03em;
+	margin-top: -0.25em;
+	text-indent: 0.03em;	
+}
+
+input {
+	background: transparent;
+	border: 0;
+	color: inherit;
+	height: 100%;
+	outline: none;
+	position: absolute;
+	text-align: center;
+	text-shadow: 0 0.025em 0.025em rgba(0,0,0,0.5);
+	width: 100%;
+}
+
+.drunk-ratio, .sober-ratio {
+	height: 50%;
+	left: 0;
+	position: absolute;
+	right: 0;
+	width: 100%;
+}
+
+.drunk-ratio {
+	top: 0;
+}
+
+.drunk-ratio input {
+	background: rgba(0,155,155,0.125);
+}
+
+.drunk-ratio input:focus {
+	background: rgba(155,155,0,0.125);
+}
+
+.sober-ratio {
+	bottom: 0;
+}
+
+.sober-shape {
+	background: rgba(128,128,255,0.125);
+	border: 1px solid rgba(255,255,255,0.125);
+	box-sizing: border-box;
+	content: "";
+	display: block;
+	left: 25%;
+	position: absolute;
+	top: 25%;
+	z-index: -1;
+}
+</style>
+
+<h1>Sobe<span>r</span>atio <small>calculate the <span>sober</span> ratio</small></h1>
+
+<div class="drunk-ratio"><input value="649:360"></div>
+<div class="sober-ratio"><input disabled></div>
+<div class="sober-shape"></div>
+
+<script>
+(function (global, document) {
+	function calculate(width, height, side) {
+		var
+		ratio = (width * 100) / (height * 100),
+		maxW = 3 in arguments ? parseInt(arguments[3], 10) : 16,
+		maxH = 4 in arguments ? parseInt(arguments[4], 10) : 16,
+		ratiosW = new Array(maxW).join(',').split(','),
+		ratiosH = new Array(maxH).join(',').split(','),
+		ratiosT = {},
+		ratios = {},
+		match,
+		key;
+	 
+		ratiosW.forEach(function (empty, ratioW) {
+			++ratioW;
+	 
+			ratiosH.forEach(function (empty, ratioH) {
+				++ratioH;
+	 
+				ratioX = (ratioW * 100) / (ratioH * 100);
+	 
+				if (!ratiosT[ratioX]) {
+					ratiosT[ratioX] = true;
+	 
+					ratios[ratioW + ':' + ratioH] = ratioX;
+				}
+			});
+		});
+	 
+		for (key in ratios) {
+			if (!match || (
+				!side && Math.abs(ratio - ratios[key]) < Math.abs(ratio - ratios[match])
+			) || (
+				side < 0 && ratios[key] <= ratio && Math.abs(ratio - ratios[key]) < Math.abs(ratio - ratios[match])
+			) || (
+				side > 0 && ratios[key] >= ratio && Math.abs(ratio - ratios[key]) < Math.abs(ratio - ratios[match])
+			)) {
+				match = key;
+			}
+		}
+	 
+		return match;
+	}
+
+	var
+	$drunk = document.querySelector('.drunk-ratio input'),
+	$sober = document.querySelector('.sober-ratio input'),
+	$shape = document.querySelector('.sober-shape'),
+	drunkRe = /^([^\d]*)(\d+)([^\d]+)(\d+)([^\d]*)$/,
+	laterRatio;
+
+	function update() {
+		var
+		drunkRatio = $drunk.value.match(drunkRe),
+		toperRatio = location.hash.match(drunkRe),
+		toperW = toperRatio ? toperRatio[2] : 16,
+		toperH = toperRatio ? toperRatio[4] : 16,
+		soberBreak, soberRatio, soberArray, soberRatioH, soberRatioW;
+
+		if (drunkRatio) {
+			soberBreak = drunkRatio[3];
+			soberRatio = calculate(drunkRatio[2], drunkRatio[4], 0, toperW, toperH).split(':').join(soberBreak);
+
+			if (soberRatio !== laterRatio) {
+				soberArray = soberRatio.split(soberBreak);
+				soberRatioH = soberArray[0] / soberArray[1];
+				soberRatioW = soberArray[1] / soberArray[0];
+
+				$sober.value = laterRatio = soberRatio;
+
+				if (soberRatioW >= 1) {
+					$shape.style.height = '50vh';
+					$shape.style.left = 'calc(50% - (' + (soberRatioH * 50) + 'vh / 2))';
+					$shape.style.top = '25%';
+					$shape.style.width = soberRatioH * 50 + 'vh';
+				} else {
+					$shape.style.height = soberRatioW * 50 + 'vw';
+					$shape.style.left = '25%';
+					$shape.style.top = 'calc(50% - (' + (soberRatioW * 50) + 'vw / 2))';
+					$shape.style.width = '50vw';
+				}
+			}
+		}
+	}
+
+	$drunk.addEventListener('input', update);
+	global.addEventListener('hashchange', update);
+
+	update();
+})(this, this.document);
+</script>
