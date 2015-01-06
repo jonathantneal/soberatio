@@ -12,9 +12,11 @@
 }
 
 * {
+	color: inherit;
 	font-family: inherit;
 	font-size: inherit;
 	font-weight: inherit;
+	text-decoration: inherit;
 }
 
 body {
@@ -29,6 +31,12 @@ h1 {
 	font-size: 50%;
 	margin-left: 5%;
 	text-shadow: 0 0.025em 0.025em rgba(0,0,0,0.5);
+}
+
+h1 a {
+	display: inline-block;
+	position: relative;
+	z-index: 1;
 }
 
 h1 span {
@@ -46,7 +54,6 @@ h1 small {
 input {
 	background: transparent;
 	border: 0;
-	color: inherit;
 	height: 100%;
 	outline: none;
 	position: absolute;
@@ -92,7 +99,7 @@ input {
 }
 </style>
 
-<h1>Sobe<span>r</span>atio <small>calculate the <span>sober</span> ratio</small></h1>
+<h1><a href="https://github.com/jonathantneal/soberatio">Sobe<span>r</span>atio <small>calculate the <span>sober</span> ratio</small></a></h1>
 
 <div class="drunk-ratio"><input value="647:357"></div>
 <div class="sober-ratio"><input disabled></div>
